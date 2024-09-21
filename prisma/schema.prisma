@@ -14,9 +14,17 @@ datasource db {
 }
 
 model User {
-  id        Int       @default(autoincrement()) @id
-  user_id   String    @unique
-  pre_exp   Int
-  username  String
-  debt      Int       @default(0)
+  id          Int        @id @default(autoincrement())
+  doulingo_id String     @unique
+  debt        Int        @default(0)
+  exps        DailyExp[]
+  username    String
+}
+
+model DailyExp {
+  id      Int      @id @default(autoincrement())
+  user    User     @relation(fields: [user_id], references: [id])
+  user_id Int
+  exp     Int      @default(0)
+  date    String 
 }

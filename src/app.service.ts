@@ -1,67 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
 import { PrismaService } from 'prisma/prisma.service';
 import { TelegramService } from './telegram/telegram.service';
+import { DoulingoService } from './doulingo/doulingo.service';
+import { CommonService } from './common/common.service';
+import { UserService } from './user/user.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
 
   constructor(
-    private prisma: PrismaService,
-    private telegram: TelegramService
+    private readonly prisma: PrismaService,
+    private readonly telegram: TelegramService,
+    private readonly doulingo: DoulingoService,
+    private readonly common: CommonService,
+    private readonly user: UserService
   ) {}
   
   async NotiExp() {
     const users = await this.prisma.user.findMany();
-    let msg_exp = `Thống kê ngày ${new Date()}`;
+    const yesterday = await this.common.getYesterday(process.env.DATE_FORMAT);
+    let msg_exp = `Thống kê ngày ${yesterday}\n`;
     let msg_debt = ""
 
     for (const user of users) {
-      const data = await this.GetExpToday(user.user_id);
-      const currentExp = data?.totalXp;
+      const data = await this.doulingo.GetExpToday(user.doulingo_id);
+      const currentExp = data?.gainedXp;
+      const date = await this.common.formatDate(data.date*1000, process.env.DATE_FORMAT);
 
-      if (currentExp < user.pre_exp + 500) {
-        msg_exp += `${user.username} còn thiếu ${user.pre_exp + 500 - currentExp} exp!\n`;
+      if (date == yesterday) {
+        if (currentExp < 500) {
+          msg_exp += `${user.username} còn thiếu ${500 - currentExp} exp!\n`;
+          await this.user.Update(user.doulingo_id, {debt: user.debt + 20});
+        } else {
+          msg_exp += `${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp!\n`;
+        }
       } else {
-        msg_exp += `${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp - user.pre_exp} exp!\n`;
+        msg_exp += `${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n`
+        await this.user.Update(user.doulingo_id, {debt: user.debt + 20});
       }
 
       msg_debt += `${user.username} đang có dư nợ ${user.debt}.000VND!\n`;
-      await this.UpdateExp(user, currentExp);
+      await this.prisma.dailyExp.create({
+        data: {
+          user_id: user.id,
+          exp: data?.gainedXp,
+          date
+        }
+      })
     }
 
-    // this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_exp);
-    // this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_debt);
-    console.log(msg_exp);
-    console.log(msg_debt);
+    this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_exp);
+    this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_debt);
     
     return 'Hello World!';
   }
 
-  async GetExpToday(userID) {
-    try {
-      const response = await axios.get(`https://www.duolingo.com/2017-06-30/users/${userID}`, {
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Accept-Encoding': 'gzip, deflate, br, zstd',
-          'User-Agent': 'Mozilla/5.0 (compatible; DuolingoStreakChecker/1.0)'
-        }
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error getID:', error);
-      return null;
-    }
-  }
-
-  async UpdateExp(user, currentExp) { 
-    await this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        pre_exp: currentExp
-      }
-    })
+  @Cron('0 10 0 * * *') // Chạy vào 12:10 AM hàng ngày
+  handleCron() {
+    this.NotiExp();
   }
 }
