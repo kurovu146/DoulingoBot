@@ -8,7 +8,6 @@ export class AppController {
 
   @Get()
   async PushNotiTele(): Promise<string> {
-    await this.appService.NotiLearning();
     return 'Hello';
   }
 }
