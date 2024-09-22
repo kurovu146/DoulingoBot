@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { PrismaService } from "../../prisma/prisma.service";
-import axios from "axios";
 import { Prisma, User } from "@prisma/client";
 import { DoulingoService } from "src/doulingo/doulingo.service";
 

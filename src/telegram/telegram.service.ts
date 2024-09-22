@@ -7,7 +7,7 @@ export class TelegramService {
 
   constructor() {
     const token = process.env.TELEGRAM_BOT_TOKEN;
-    this.bot = new TelegramBot(token, { polling: true });
+    this.bot = new TelegramBot(token);
 
     this.bot.onText(/\/start/, (msg) => {
       this.sendMessage(msg.chat.id, 'Welcome to the bot!');
