@@ -80,12 +80,12 @@ export class AppService {
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
   }
 
-  @Cron('0 10 0 * * *') // Chạy vào 12:10 AM hàng ngày
+  @Cron('0 10 23 * * *') // Chạy vào 12:10 AM hàng ngày
   NotiStatisticTele() {
     this.NotiExp();
   }
 
-  @Cron('0 0 23 * * *')
+  @Cron('0 0 0 * * *')
   NotiRemindLearning() {
     this.NotiLearning();
   }
