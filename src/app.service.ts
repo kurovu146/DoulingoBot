@@ -82,11 +82,13 @@ export class AppService {
 
   @Cron('0 5 17 * * *') // Chạy vào 12:10 AM hàng ngày
   NotiStatisticTele() {
+    console.log('Cronjob thống kê!');
     this.NotiExp();
   }
 
   @Cron('0 0 16 * * *')
   NotiRemindLearning() {
+    console.log('Cronjob nhắc nhở!');
     this.NotiLearning();
   }
 }
