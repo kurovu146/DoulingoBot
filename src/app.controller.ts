@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from 'prisma/prisma.service';
 
@@ -9,5 +9,15 @@ export class AppController {
   @Get()
   async PushNotiTele(): Promise<string> {
     return 'Hello';
+  }
+
+  @Post('/exp')
+  async PushNotiExp() {
+    await this.appService.NotiExp();
+  }
+
+  @Post('/remind')
+  async PushNotiRemind() {
+    await this.appService.NotiLearning();
   }
 }

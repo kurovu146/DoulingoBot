@@ -4,7 +4,6 @@ import { TelegramService } from './telegram/telegram.service';
 import { DoulingoService } from './doulingo/doulingo.service';
 import { CommonService } from './common/common.service';
 import { UserService } from './user/user.service';
-import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -78,15 +77,5 @@ export class AppService {
     }
 
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
-  }
-
-  @Cron('0 5 17 * * *') // Chạy vào 12:10 AM hàng ngày
-  NotiStatisticTele() {
-    this.NotiExp();
-  }
-
-  @Cron('0 0 16 * * *')
-  NotiRemindLearning() {
-    this.NotiLearning();
   }
 }
