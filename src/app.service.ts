@@ -83,16 +83,19 @@ export class AppService {
 
   @Cron('5 17 * * *')
   async CronNotiExp() {
+    console.log('CronNotiExp');
     await this.NotiExp();
   }
 
   @Cron('0 16 * * *')
   async CronNotiRemind1() {
+    console.log('CronNotiRemind1');
     await this.NotiLearning();
   }
 
   @Cron('0 15 * * *')
   async CronNotiRemind2() {
+    console.log('CronNotiRemind2');
     await this.NotiLearning();
   }
 }
