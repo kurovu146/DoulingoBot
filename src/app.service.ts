@@ -27,7 +27,7 @@ export class AppService {
       const data = await this.doulingo.GetExpToday(user.doulingo_id);
       const userData = data?.map(item => this.common.formatDate(item.date*1000, process.env.DATE_FORMAT) == yesterday ? item : 0).find(item => item !== 0);
       const currentExp = userData?.gainedXp;
-      const date = await this.common.formatDate(data.date*1000, process.env.DATE_FORMAT);
+      const date = await this.common.formatDate(userData?.date*1000, process.env.DATE_FORMAT);
 
       if (date == yesterday) {
         if (currentExp < 500) {
@@ -55,6 +55,7 @@ export class AppService {
 
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_exp);
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_debt);
+    
   }
 
   async NotiLearning() {
@@ -81,19 +82,19 @@ export class AppService {
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
   }
 
-  @Cron('5 17 * * *')
+  @Cron('0 5 17 * * *')
   async CronNotiExp() {
     console.log('CronNotiExp');
     await this.NotiExp();
   }
 
-  @Cron('0 16 * * *')
+  @Cron('0 0 16 * * *')
   async CronNotiRemind1() {
     console.log('CronNotiRemind1');
     await this.NotiLearning();
   }
 
-  @Cron('0 15 * * *')
+  @Cron('0 0 15 * * *')
   async CronNotiRemind2() {
     console.log('CronNotiRemind2');
     await this.NotiLearning();
