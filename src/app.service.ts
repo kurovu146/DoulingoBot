@@ -81,13 +81,18 @@ export class AppService {
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
   }
 
-  @Cron('5 0 * * *')
+  @Cron('5 17 * * *')
   async CronNotiExp() {
     await this.NotiExp();
   }
 
-  @Cron('0 23 * * *')
-  async CronNotiRemind() {
-    await this.NotiExp();
+  @Cron('0 16 * * *')
+  async CronNotiRemind1() {
+    await this.NotiLearning();
+  }
+
+  @Cron('0 15 * * *')
+  async CronNotiRemind2() {
+    await this.NotiLearning();
   }
 }
