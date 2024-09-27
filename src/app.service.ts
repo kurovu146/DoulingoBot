@@ -4,6 +4,7 @@ import { TelegramService } from './telegram/telegram.service';
 import { DoulingoService } from './doulingo/doulingo.service';
 import { CommonService } from './common/common.service';
 import { UserService } from './user/user.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -24,7 +25,8 @@ export class AppService {
 
     for (const user of users) {
       const data = await this.doulingo.GetExpToday(user.doulingo_id);
-      const currentExp = data?.gainedXp;
+      const userData = data?.map(item => this.common.formatDate(item.date*1000, process.env.DATE_FORMAT) == yesterday ? item : 0).find(item => item !== 0);
+      const currentExp = userData?.gainedXp;
       const date = await this.common.formatDate(data.date*1000, process.env.DATE_FORMAT);
 
       if (date == yesterday) {
@@ -77,5 +79,15 @@ export class AppService {
     }
 
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
+  }
+
+  @Cron('5 0 * * *')
+  async CronNotiExp() {
+    await this.NotiExp();
+  }
+
+  @Cron('0 23 * * *')
+  async CronNotiRemind() {
+    await this.NotiExp();
   }
 }

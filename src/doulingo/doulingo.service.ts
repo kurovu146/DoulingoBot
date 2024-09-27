@@ -28,7 +28,7 @@ export class DoulingoService {
           'User-Agent': 'Mozilla/5.0 (compatible; DuolingoStreakChecker/1.0)'
         }
       });
-      return response.data?.summaries[0];
+      return response.data?.summaries.slice(0, 2);
     } catch (error) {
       console.error('Error getID:', error);
       return null;
