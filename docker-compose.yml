@@ -1,0 +1,26 @@
+
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: vutuanyt14
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - postgres-network
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - postgres-network
+networks:
+  postgres-network:
+    driver: bridge
