@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: vutuanyt14
       PGDATA: /data/postgres
     volumes:
-       - postgres:/data/postgres
+       - /data/postgres
     ports:
       - "5432:5432"
     restart: unless-stopped
