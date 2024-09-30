@@ -4,7 +4,7 @@ import { TelegramService } from './telegram/telegram.service';
 import { DoulingoService } from './doulingo/doulingo.service';
 import { CommonService } from './common/common.service';
 import { UserService } from './user/user.service';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -70,33 +70,33 @@ export class AppService {
     
       if (date == now) {
         if (currentExp < 500) {
-          msg_remind += `${user.username} còn thiếu ${500 - currentExp} exp!\n`;
+          msg_remind += `🚀 ${user.username} còn thiếu ${500 - currentExp} exp!\n\n`;
         } else {
-          msg_remind += `${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp\n`;
+          msg_remind += `✅ ${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp\n\n`;
         }
       } else {
-        msg_remind += `${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n`
+        msg_remind += `❌ ${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n\n`
       }
     }
 
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
   }
 
-  @Cron('0 5 17 * * *')
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async CronNotiExp() {
     console.log('CronNotiExp');
     await this.NotiExp();
   }
 
-  @Cron('0 0 16 * * *')
+  @Cron(CronExpression.EVERY_6_HOURS)
   async CronNotiRemind1() {
     console.log('CronNotiRemind1');
     await this.NotiLearning();
   }
 
-  @Cron('0 0 15 * * *')
-  async CronNotiRemind2() {
-    console.log('CronNotiRemind2');
-    await this.NotiLearning();
-  }
+  // @Cron('0 0 15 * * *')
+  // async CronNotiRemind2() {
+  //   console.log('CronNotiRemind2');
+  //   await this.NotiLearning();
+  // }
 }
