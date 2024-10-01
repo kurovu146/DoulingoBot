@@ -82,7 +82,7 @@ export class AppService {
     this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  @Cron("0 10 0 * * *")
   async CronNotiExp() {
     console.log('CronNotiExp');
     await this.NotiExp();
@@ -94,9 +94,9 @@ export class AppService {
     await this.NotiLearning();
   }
 
-  // @Cron('0 0 15 * * *')
+  // @Cron(CronExpression.EVERY_MINUTE)
   // async CronNotiRemind2() {
-  //   console.log('CronNotiRemind2');
-  //   await this.NotiLearning();
+  //   console.log('Ping');
+  //   // await this.NotiLearning();
   // }
 }
