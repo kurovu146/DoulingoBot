@@ -31,19 +31,21 @@ export class AppService {
 
       if (date == yesterday) {
         if (currentExp < 500) {
-          msg_exp += `${user.username} còn thiếu ${500 - currentExp} exp!\n`;
+          msg_exp += `⚠️ ${user.username} còn thiếu ${500 - currentExp} exp!\n\n`;
           user.debt = user.debt + 20;
           await this.user.Update(user.doulingo_id, {debt: user.debt});
         } else {
-          msg_exp += `${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp\n`;
+          msg_exp += `❤️ ${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp\n\n`;
         }
       } else {
-        msg_exp += `${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n`
+        msg_exp += `☠️ ${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n\n`
         user.debt = user.debt + 20;
         await this.user.Update(user.doulingo_id, {debt: user.debt});
       }
 
-      msg_debt += `${user.username} đang có dư nợ ${user.debt}.000VND!\n`;
+      msg_debt += `${user.username} đang có dư nợ ${new Intl.NumberFormat('vn-VN', { maximumSignificantDigits: 3 }).format(
+        user.debt,
+      )}VND!\n\n`;
       await this.prisma.dailyExp.create({
         data: {
           user_id: user.id,
@@ -88,7 +90,7 @@ export class AppService {
     await this.NotiExp();
   }
 
-  @Cron(CronExpression.EVERY_6_HOURS)
+  @Cron("0 9,17,23 * * *")
   async CronNotiRemind1() {
     console.log('CronNotiRemind1');
     await this.NotiLearning();
