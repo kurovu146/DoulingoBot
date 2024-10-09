@@ -67,8 +67,8 @@ export class AppService {
 
     for (const user of users) {
       const data = await this.doulingo.GetExpToday(user.doulingo_id);
-      const currentExp = data?.gainedXp;
-      const date = this.common.formatDate(data.date*1000, process.env.DATE_FORMAT);
+      const currentExp = data[0]?.gainedXp;
+      const date = this.common.formatDate(data[0].date*1000, process.env.DATE_FORMAT);
     
       if (date == now) {
         if (currentExp < 500) {
