@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Logger, LoggerService, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { Prisma, User } from "@prisma/client";
@@ -6,6 +6,8 @@ import { DoulingoService } from "src/doulingo/doulingo.service";
 
 @Controller('users')
 export class UserController {
+  private readonly logger: LoggerService = new Logger(UserController.name, {timestamp: true});
+
   constructor(
     private readonly userService: UserService,
     private readonly prisma: PrismaService,
@@ -19,21 +21,37 @@ export class UserController {
 
   @Post()
   async CreateMember() {
-    const users = ["Kuro146", "longvuit18", "thangthuy9900", "tunali0907"]
-    const result: Prisma.UserCreateInput[] = []
-    for (const user of users) {
-      const data = await this.doulingo.GetID(user)
-      const m_user = {doulingo_id: String(data.id), username: data.username}
-      result.push(m_user)
+    try {
+      const users = ["Kuro146", "longvuit18", "thangtrinh220199", "tunali0907"]
+      const result: Prisma.UserCreateInput[] = []
+      for (const user of users) {
+        const data = await this.doulingo.GetID(user);
+        console.log(data.id);
+        
+        const m_user = {doulingo_id: String(data.id), username: data.username}
+        result.push(m_user)
+      }
+      
+      await this.userService.CreateMany(result)
+    } catch (error) {
+      this.logger.error(error);
     }
     
-    await this.userService.CreateMany(result)
   }
 
   @Put()
-  async UpdateDebt(@Body() body: {doulingo_id: string, debt: number}) {
-    await this.userService.Update(body.doulingo_id, {debt: body.debt})
+  async UpdateDebt(@Body() body: {name: string, debt: number}) {
+    try {
+      let users = {
+        "DTuan": "1170512027",
+        "Vu": "1207989193",
+        "Thang": "1339837511",
+        "ATuan": "764052804"
+      }
+      
+      await this.userService.Update(users[body.name], {debt: body.debt})
+    } catch (error) {
+      this.logger.error('Fail to update debt!', error)
+    }
   }
-
-  
 }
