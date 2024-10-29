@@ -26,13 +26,14 @@ export class UserController {
       const result: Prisma.UserCreateInput[] = []
       for (const user of users) {
         const data = await this.doulingo.GetID(user);
-        console.log(data.id);
+        this.logger.log(data.id);
         
         const m_user = {doulingo_id: String(data.id), username: data.username}
         result.push(m_user)
       }
       
-      await this.userService.CreateMany(result)
+      await this.userService.CreateMany(result);
+      this.logger.log('Create user successfully!');
     } catch (error) {
       this.logger.error(error);
     }
@@ -49,7 +50,8 @@ export class UserController {
         "ATuan": "764052804"
       }
       
-      await this.userService.Update(users[body.name], {debt: body.debt})
+      await this.userService.Update(users[body.name], {debt: body.debt});
+      this.logger.log('Update user successfully!');
     } catch (error) {
       this.logger.error('Fail to update debt!', error)
     }

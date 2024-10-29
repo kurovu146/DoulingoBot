@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger, LoggerService } from "@nestjs/common";
 import axios from "axios";
 
 @Injectable()
 export class DoulingoService {
+  private readonly logger: LoggerService = new Logger(DoulingoService.name, { timestamp: true });
+
   async GetID(username: string) {
     try {
       const response = await axios.get(`https://www.duolingo.com/2017-06-30/users?username=${username}`, {
@@ -12,9 +14,12 @@ export class DoulingoService {
           'User-Agent': 'Mozilla/5.0 (compatible; DuolingoStreakChecker/1.0)'
         }
       });
+      this.logger.log('Get user data successfully!');
+
       return response.data.users[0];
     } catch (error) {
-      console.error('Error getID:', error);
+      this.logger.log('Error getID:', error);
+
       return null;
     }
   }
@@ -28,9 +33,12 @@ export class DoulingoService {
           'User-Agent': 'Mozilla/5.0 (compatible; DuolingoStreakChecker/1.0)'
         }
       });
+      this.logger.log('Get exp data successfully!');
+
       return response.data?.summaries.slice(0, 2);
     } catch (error) {
-      console.error('Error getID:', error);
+      this.logger.log('Error exp:', error);
+
       return null;
     }
   }

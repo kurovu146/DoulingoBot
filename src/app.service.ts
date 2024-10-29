@@ -8,7 +8,7 @@ import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
-  private readonly logger: LoggerService = new Logger(AppService.name, { timestamp: true })
+  private readonly logger: LoggerService = new Logger(AppService.name, { timestamp: true });
 
   constructor(
     private readonly prisma: PrismaService,
@@ -57,12 +57,12 @@ export class AppService {
         })
       }
 
-      this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_exp);
-      this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_debt);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_exp);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_debt);
       this.logger.log('Thống kê thành công!');
     } catch(error) {
       this.logger.error(error);
-      this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error);
     }
   }
 
@@ -88,23 +88,23 @@ export class AppService {
         }
       }
 
-      this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
       this.logger.log('Nhắc nhở thành công!');
     } catch (error) {
       this.logger.error(error);
-      this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error);
     }
   }
 
   @Cron("0 10 0 * * *")
   async CronNotiExp() {
-    console.log('CronNotiExp');
+    this.logger.log('CronNotiExp');
     await this.NotiExp();
   }
 
-  @Cron("0 9,17,23 * * *")
+  @Cron("0 21,22,23 * * *")
   async CronNotiRemind1() {
-    console.log('CronNotiRemind1');
+    this.logger.log('CronNotiRemind1');
     await this.NotiLearning();
   }
 }
