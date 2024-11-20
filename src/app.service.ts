@@ -26,6 +26,7 @@ export class AppService {
       let msg_debt = ""
 
       for (const user of users) {
+        this.logger.debug(user);
         const data = await this.doulingo.GetExpToday(user.doulingo_id);
         const userData = data?.map(item => this.common.formatDate(item.date*1000, process.env.DATE_FORMAT) == yesterday ? item : 0).find(item => item !== 0);
         const currentExp = userData?.gainedXp;
@@ -36,9 +37,12 @@ export class AppService {
             msg_exp += `⚠️ ${user.username} còn thiếu ${500 - currentExp} exp!\n\n`;
             user.debt = user.debt + 20;
             await this.user.Update(user.doulingo_id, {debt: user.debt});
+            this.logger.debug("Update success!");
+
           } else {
             msg_exp += `❤️ ${user.username} đã suất sắc hoàn thành mục tiêu ngày hôm nay với ${currentExp} exp\n\n`;
           }
+          
         } else {
           msg_exp += `☠️ ${user.username} lười đến nỗi không học bài nào ngày hôm nay!\n\n`
           user.debt = user.debt + 20;
@@ -73,11 +77,13 @@ export class AppService {
       let msg_remind = `Hệ thống nhắc nhở các anh zai chú ý việc học ngày ${now}\n`;
 
       for (const user of users) {
+        this.logger.debug(user);
         const data = await this.doulingo.GetExpToday(user.doulingo_id);
         const currentExp = data[0]?.gainedXp;
         const date = this.common.formatDate(data[0].date*1000, process.env.DATE_FORMAT);
       
         if (date == now) {
+          this.logger.debug("Test h");
           if (currentExp < 500) {
             msg_remind += `🚀 ${user.username} còn thiếu ${500 - currentExp} exp!\n\n`;
           } else {
