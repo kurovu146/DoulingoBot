@@ -94,7 +94,7 @@ export class AppService {
         }
       }
 
-      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
+      // await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), msg_remind);
       this.logger.log('Nhắc nhở thành công!');
     } catch (error) {
       this.logger.error(error);
