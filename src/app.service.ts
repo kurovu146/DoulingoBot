@@ -98,7 +98,7 @@ export class AppService {
       this.logger.log('Nhắc nhở thành công!');
     } catch (error) {
       this.logger.error(error);
-      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error);
+      await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error?.message);
     }
   }
 
