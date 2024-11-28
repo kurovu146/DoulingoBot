@@ -10,7 +10,9 @@ import { UserService } from './user/user.service';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [TelegramModule, UserModule,
+  imports: [
+    TelegramModule, 
+    UserModule,
     ScheduleModule.forRoot()
   ],
   controllers: [AppController],
