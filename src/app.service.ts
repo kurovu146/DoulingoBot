@@ -26,10 +26,10 @@ export class AppService {
       let msg_debt = ""
 
       for (const user of users) {
-        this.logger.debug(user);
         const data = await this.doulingo.GetExpToday(user.doulingo_id);
         const userData = data?.map(item => this.common.formatDate(item.date*1000, process.env.DATE_FORMAT) == yesterday ? item : 0).find(item => item !== 0);
         const currentExp = userData?.gainedXp;
+        const totalSessionTime = userData?.totalSessionTime;
         const date = await this.common.formatDate(userData?.date*1000, process.env.DATE_FORMAT);
 
         if (date == yesterday) {
@@ -55,7 +55,8 @@ export class AppService {
         await this.prisma.dailyExp.create({
           data: {
             user_id: user.id,
-            exp: data?.gainedXp,
+            exp: currentExp,
+            time: totalSessionTime,
             date: await this.common.formatDate(new Date(), process.env.DATE_FORMAT)
           }
         })
@@ -77,13 +78,11 @@ export class AppService {
       let msg_remind = `Hệ thống nhắc nhở các anh zai chú ý việc học ngày ${now}\n`;
 
       for (const user of users) {
-        this.logger.debug(user);
         const data = await this.doulingo.GetExpToday(user.doulingo_id);
         const currentExp = data[0]?.gainedXp;
         const date = this.common.formatDate(data[0].date*1000, process.env.DATE_FORMAT);
       
         if (date == now) {
-          this.logger.debug("Test h");
           if (currentExp < 500) {
             msg_remind += `🚀 ${user.username} còn thiếu ${500 - currentExp} exp!\n\n`;
           } else {
@@ -100,6 +99,44 @@ export class AppService {
       this.logger.error(error);
       await this.telegram.sendMessage(Number(process.env.TELEGRAM_CHAT_ID), error?.message);
     }
+  }
+
+  async WeeklyReport() {
+    let item = 1;
+    console.log(1, this.common.getDayBefore(7, process.env.DATE_FORMAT));
+    console.log(2, this.common.formatDate(new Date(), process.env.DATE_FORMAT));
+    
+    const lastWeekReport = await this.prisma.dailyExp.findMany({
+      where: { 
+        user_id: item,
+        date: {
+          gte: this.common.getDayBefore(13, process.env.DATE_FORMAT),
+          lte: this.common.getDayBefore(7, process.env.DATE_FORMAT)
+        }
+      }
+    });
+
+    const thisWeekReport = await this.prisma.dailyExp.findMany({
+      where: { 
+        user_id: item,
+        date: {
+          gte: this.common.getDayBefore(6, process.env.DATE_FORMAT),
+          lte: this.common.formatDate(new Date(), process.env.DATE_FORMAT)
+        }
+      }
+    });
+
+    const last_week_total_exp = lastWeekReport.reduce((accumulator, current) => {
+      return accumulator + current.exp;
+    }, 0);
+
+    const this_week_total_exp = thisWeekReport.reduce((accumulator, current) => {
+      return accumulator + current.exp;
+    }, 0);
+
+    console.log(await this.doulingo.GetExpWeekly(1170512027));
+    
+    // return this.doulingo.GetExpWeekly(1170512027);
   }
 
   @Cron("0 10 0 * * *")

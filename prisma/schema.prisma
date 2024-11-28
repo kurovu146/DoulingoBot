@@ -26,5 +26,6 @@ model DailyExp {
   user    User     @relation(fields: [user_id], references: [id])
   user_id Int
   exp     Int      @default(0)
+  time    Int      @default(0)
   date    String 
 }

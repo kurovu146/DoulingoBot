@@ -20,4 +20,9 @@ export class AppController {
   async PushNotiRemind() {
     await this.appService.NotiLearning();
   }
+
+  @Post('/weekly-report')
+  async WeeklyReport() {
+    return await this.appService.WeeklyReport();
+  }
 }

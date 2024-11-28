@@ -10,4 +10,8 @@ export class CommonService {
   getYesterday(formatString: string): string {
     return moment().tz('Asia/Bangkok').subtract(1, 'days').format(formatString);
   }
+
+  getDayBefore(numberOfDay: number, formatString: string): string {
+    return moment().tz('Asia/Bangkok').subtract(numberOfDay, 'days').format(formatString);
+  }
 }
